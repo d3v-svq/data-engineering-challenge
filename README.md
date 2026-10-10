@@ -13,10 +13,10 @@ The sample data we got from their charging infrastructure includes operational m
 - System diagnostics and notifications
 
 Because of the size the data, it is split into two files:
-- [`ocpp-data-many-chargers.txt`](ocpp-data-many-chargers.txt)
-- [`ocpp-data-many-days.txt`](ocpp-data-many-days.txt)
+- [`ocpp-data-many-chargers.txt`](data/ocpp-data-many-chargers.txt)
+- [`ocpp-data-many-days.txt`](data/ocpp-data-many-days.txt)
 
-This dataset represents typical patterns you'd encounter in EV charging infrastructure between charge points and the grid. You find in the [`ocpp-data-many-chargers.txt`](ocpp-data-many-chargers.txt) file, here is an extract of the first rows:
+This dataset represents typical patterns you'd encounter in EV charging infrastructure between charge points and the grid. You find in the [`ocpp-data-many-chargers.txt`](data/ocpp-data-many-chargers.txt) file, here is an extract of the first rows:
 ```
 charger6 : [2,"ef51a638-0e05-4a9d-be52-594ada28f153","MeterValues",{"connectorId":1,"transactionId":1,"meterValue":[{"timestamp":"2025-08-26T23:59:57.599Z","sampledValue":[{"value":"37.3","context":"Sample.Periodic","format":"Raw","measurand":"Current.Import","location":"Outlet","unit":"A"},{"value":"30850.8733","context":"Sample.Periodic","format":"Raw","measurand":"Energy.Active.Import.Register","location":"Outlet","unit":"kWh"},{"value":"0.0469","context":"Sample.Periodic","format":"Raw","measurand":"Energy.Active.Import.Interval","location":"Outlet","unit":"kWh"},{"value":"20.7","context":"Sample.Periodic","format":"Raw","measurand":"Power.Active.Import","location":"Outlet","unit":"kW"},{"value":"587.2","context":"Sample.Periodic","format":"Raw","measurand":"Voltage","location":"Outlet","unit":"V"},{"value":"67","context":"Sample.Periodic","format":"Raw","measurand":"SoC","location":"EV","unit":"Percent"},{"value":"200","context":"Sample.Periodic","format":"Raw","measurand":"Current.Offered","location":"Outlet","unit":"A"},{"value":"60000","context":"Sample.Periodic","format":"Raw","measurand":"Power.Offered","location":"Outlet","unit":"W"}]}]}]
 charger6 : [3,"ef51a638-0e05-4a9d-be52-594ada28f153",{}]

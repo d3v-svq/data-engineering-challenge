@@ -15,8 +15,9 @@ use crate::parser::extract_metrics_from_file;
 #[tokio::main]
 async fn main() -> Result<()> {
     let input_file = "../../data/ocpp-data-many-chargers-small-sample.txt";
-    let brokers = "localhost:29092";
-    let schema_registry_url = "http://localhost:18081";
+    let remote_host = "192.168.1.131";
+    let brokers = format!("{}:29092", remote_host);
+    let schema_registry_url = format!("http://{}:18081", remote_host);
     let topic = "op_metric";
 
     let producer: FutureProducer = ClientConfig::new()

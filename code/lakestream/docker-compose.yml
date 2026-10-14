@@ -81,7 +81,7 @@ services:
     command: ["standalone", "--data-dir=/data", "--shards=8"]
     entrypoint: ["/oxia/bin/oxia"]
     ports:
-      - "127.0.0.1:6648:6648"
+      - "6648:6648"
     volumes:
       - oxia-data:/data
     healthcheck:
@@ -95,8 +95,8 @@ services:
     hostname: minio
     #command: ["server", "/data", "--console-address", ":9001"]
     ports:
-      - "127.0.0.1:19000:9000"
-      - "127.0.0.1:19001:9001"
+      - "19000:9000"
+      - "19001:9001"
     environment:
       RUSTFS_ROOT_USER: minioadmin
       RUSTFS_ROOT_PASSWORD: minioadmin
@@ -131,8 +131,8 @@ services:
       minio-init:
         condition: service_completed_successfully
     ports:
-      - "127.0.0.1:18181:8181"
-      - "127.0.0.1:18182:8182"
+      - "18181:8181"
+      - "18182:8182"
     environment:
       AWS_REGION: us-east-1
       AWS_ACCESS_KEY_ID: minioadmin
@@ -189,7 +189,7 @@ services:
     depends_on:
       - kafka-1
     ports:
-      - "127.0.0.1:18081:8081"
+      - "18081:8081"
     # The image has no entrypoint; this module is the schema registry.
     entrypoint: ["python3", "-m", "karapace"]
     environment:
@@ -271,11 +271,11 @@ services:
     <<: *kafka-service
     hostname: kafka-1
     ports:
-      - "127.0.0.1:29092:9092"
+      - "29092:9092"
     environment:
       <<: *kafka-environment
       KAFKA_NODE_ID: "1"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka-1:19092,PLAINTEXT_HOST://localhost:29092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka-1:19092,PLAINTEXT_HOST://${KAFKA_ADVERTISED_LISTENERS_HOST:-localhost}:29092"
     volumes:
       - kafka-1-data:/var/lib/kafka/data
 

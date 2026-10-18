@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
     let _schema = Schema::parse_str(AVRO_SCHEMA).context("Failed to parse Avro Schema")?;
     let subject_name_strategy = SubjectNameStrategy::TopicNameStrategy(topic.to_string(), false);
 
-    let metrics_iter = extract_metrics_from_file(input_file)?;
+    let metrics_iter = extract_metrics_from_file(&input_file)?;
 
     for metric in metrics_iter {
         let value_payload = serde_json::to_value(&metric)?;
@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
             .await
             .context("Failed to encode payload via Schema Registry")?;
 
-        let record = FutureRecord::to(topic)
+        let record = FutureRecord::to(&topic)
             .key(&metric.station_id)
             .payload(&encoded_payload);
 

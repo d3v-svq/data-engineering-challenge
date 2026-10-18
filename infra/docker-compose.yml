@@ -410,10 +410,10 @@ services:
     profiles: [ "e2e", "streaming-analytics"]
     restart: unless-stopped
     depends_on:
-      kafka-1:
-        condition: service_healthy
-      schema-registry:
-        condition: service_healthy
+      create-subject-schema-registry:
+        condition: service_completed_successfully
+      create-topic:
+        condition: service_completed_successfully
       influxdb:
         condition: service_healthy
     volumes:

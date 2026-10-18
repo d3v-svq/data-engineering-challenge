@@ -279,6 +279,90 @@ services:
       - kafka-1-data:/var/lib/kafka/data
 
 
+  kafka-ready:
+    <<: *kafka-cli
+    depends_on:
+      - kafka-1
+    entrypoint: [ "/bin/bash", "-ec" ]
+    command:
+      - |
+        echo "Waiting for the Kafka brokers..."
+        for attempt in $$(seq 1 60); do
+          if /opt/kafka/bin/kafka-topics.sh \
+              --bootstrap-server kafka-1:19092 --list >/dev/null 2>&1; then
+            break
+          fi
+          echo "Brokers not ready yet, waiting... ($$attempt/60)"
+          sleep 5
+        done
+        echo "Waiting for the KRaft controller quorum..."
+        for attempt in $$(seq 1 60); do
+          if /opt/kafka/bin/kafka-metadata-quorum.sh \
+              --bootstrap-server kafka-1:19092 describe --status >/dev/null 2>&1; then
+            break
+          fi
+          echo "Controller quorum not ready yet, waiting... ($$attempt/60)"
+          sleep 5
+        done
+        /opt/kafka/bin/kafka-metadata-quorum.sh \
+          --bootstrap-server kafka-1:19092 describe --status
+        echo "Kafka cluster is ready."
+
+  create-topic:
+    <<: *kafka-cli
+    profiles: ["demo"]
+    depends_on:
+      kafka-ready:
+        condition: service_completed_successfully
+    environment:
+      KAFKA_BROKER: kafka-1:19092
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        topic=$${KAFKA_TOPIC}
+        bootstrap=$${KAFKA_BROKER}
+        partitions=2
+        # `--timeout-ms` only exists on some kafka-topics.sh builds.
+        extra_timeout=()
+        if /opt/kafka/bin/kafka-topics.sh --help 2>&1 | grep -q -- '--timeout-ms'; then
+          extra_timeout+=(--timeout-ms 120000)
+        fi
+        echo "Creating topic $$topic with $$partitions partitions..."
+        for attempt in $$(seq 1 60); do
+          if /opt/kafka/bin/kafka-topics.sh \
+              --bootstrap-server "$$bootstrap" \
+              --create \
+              --if-not-exists \
+              --config ursa.storage.enable=true \
+              --topic "$$topic" \
+              --partitions $$partitions \
+              --replication-factor 1 \
+              "$${extra_timeout[@]}"; then
+            echo "Created topic: $$topic"
+            exit 0
+          fi
+          echo "Topic creation not ready yet, retrying... ($$attempt/60)"
+          sleep 5
+        done
+        echo "Failed to create topic after retries: $$topic" >&2
+        exit 1
+
+
+  # Registers the OpMetric schema avro in schema-registry
+  create-subject-schema-registry:
+    image: alpine/curl:8.21.0
+    restart: "no"
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+        required: false
+    environment:
+      KAFKA_TOPIC: ${KAFKA_TOPIC}
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    volumes:
+      - ./lakehouse/create-entry-schema-registry.sh:/opt/ursa-demo/create-entry-schema-registry.sh:ro
+    entrypoint: [ "/bin/sh", "/opt/ursa-demo/create-entry-schema-registry.sh" ]
   # ---------------------------------------------------------------------------
   # Profile: e2e - on-demand SQL shell against the local Polaris catalog.
   # ---------------------------------------------------------------------------

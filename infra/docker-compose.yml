@@ -363,6 +363,7 @@ services:
     volumes:
       - ./lakehouse/create-entry-schema-registry.sh:/opt/ursa-demo/create-entry-schema-registry.sh:ro
     entrypoint: [ "/bin/sh", "/opt/ursa-demo/create-entry-schema-registry.sh" ]
+
   # ---------------------------------------------------------------------------
   # Profile: e2e - on-demand SQL shell against the local Polaris catalog.
   # ---------------------------------------------------------------------------
@@ -422,7 +423,7 @@ services:
       - INFLUX_ORG=${INFLUX_ORG:-ev_network}
       - INFLUX_BUCKET=${INFLUX_BUCKET:-ocpp_data}
       - INFLUX_TOKEN=${INFLUX_TOKEN:-my-super-secret-auth-token}
-      - KAFKA_BROKER=kafka-1:29092
+      - KAFKA_BROKER=kafka-1:19092
       - KAFKA_TOPIC=${KAFKA_TOPIC}
       - SCHEMA_REGISTRY="http://schema-registry:18081"
 

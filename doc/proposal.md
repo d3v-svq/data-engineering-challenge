@@ -111,7 +111,7 @@ In this section we are going to cover the "things" we must improve to bring this
   * doesn't use automatism (lint, code analysis, code quality, etc.)
 
 ## To be production ready
-* Change standalone deployments for cluster deployments.
+* Replace standalone deployments with cluster deployments.
 * Use an IaC tool for services deployments instead of docker-compose file.
 * Use CI/CD tools to ensure good practices in integrations and deployments.
 * Enable security by default: central user management, using secure credentials, encrypt data, access control, etc.

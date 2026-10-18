@@ -332,7 +332,7 @@ services:
       influxdb:
         condition: service_healthy
     volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./time_series_ingest/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     environment:
       - INFLUX_URL="http://influxdb2:8086"
       - INFLUX_ORG=${INFLUX_ORG:-ev_network}

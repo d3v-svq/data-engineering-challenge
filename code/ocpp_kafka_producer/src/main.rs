@@ -1,19 +1,19 @@
+mod cli;
 mod models;
 mod parser;
-mod cli;
 
 use anyhow::{Context, Result};
 use apache_avro::schema::Schema;
+use clap::Parser;
 use rdkafka::config::ClientConfig;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use schema_registry_converter::async_impl::avro::AvroEncoder;
 use schema_registry_converter::async_impl::schema_registry::SrSettings;
 use schema_registry_converter::schema_registry_common::SubjectNameStrategy;
-use clap::Parser;
 
+use crate::cli::Cli;
 use crate::models::AVRO_SCHEMA;
 use crate::parser::extract_metrics_from_file;
-use crate::cli::Cli;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -49,7 +49,10 @@ async fn main() -> Result<()> {
             .key(&metric.station_id)
             .payload(&encoded_payload);
 
-        match producer.send(record, tokio::time::Duration::from_secs(0)).await {
+        match producer
+            .send(record, tokio::time::Duration::from_secs(0))
+            .await
+        {
             Ok((partition, offset)) => {
                 println!(
                     "Published {} metric for station {} to partition {} at offset {}",

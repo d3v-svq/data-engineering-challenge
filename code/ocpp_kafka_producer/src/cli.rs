@@ -14,5 +14,5 @@ pub struct Cli {
     pub kafka_topic: String,
     /// Kafka schema registry url in format -> http://<host|ip>:<port>
     #[arg(long)]
-    pub kafka_schema_registry_url: String
+    pub kafka_schema_registry_url: String,
 }

@@ -3,7 +3,6 @@ use chrono::DateTime;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-
 /// Parses a raw log line into a stream of flattened OpMetrics
 pub fn parse_line_to_metrics(line: &str) -> Option<impl Iterator<Item = OpMetric> + '_> {
     let (station_id_raw, json_raw) = line.split_once(':')?;
@@ -44,7 +43,9 @@ pub fn parse_line_to_metrics(line: &str) -> Option<impl Iterator<Item = OpMetric
 }
 
 /// Reads a file line-by-line and extracts metrics lazily
-pub fn extract_metrics_from_file(file_path: &str) -> anyhow::Result<impl Iterator<Item = OpMetric>> {
+pub fn extract_metrics_from_file(
+    file_path: &str,
+) -> anyhow::Result<impl Iterator<Item = OpMetric>> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
 
@@ -100,22 +101,28 @@ mod tests {
         let metrics: Vec<OpMetric> = parse_line_to_metrics(input).unwrap().collect();
 
         assert_eq!(metrics.len(), 2);
-        assert_eq!(metrics[0], OpMetric {
-            event_ts: 1755910742720, // 2025-08-23T00:59:02.720Z in millis
-            station_id: "charger1".to_string(),
-            location: "Outlet".to_string(),
-            metric: "Current.Import".to_string(),
-            value: 24.8,
-            unit: "A".to_string(),
-        });
-        assert_eq!(metrics[1], OpMetric {
-            event_ts: 1755910742720, // 2025-08-23T00:59:02.720Z in millis
-            station_id: "charger1".to_string(),
-            location: "Outlet".to_string(),
-            metric: "Energy.Active.Import.Register".to_string(),
-            value: 19334.1709,
-            unit: "kWh".to_string(),
-        });
+        assert_eq!(
+            metrics[0],
+            OpMetric {
+                event_ts: 1755910742720, // 2025-08-23T00:59:02.720Z in millis
+                station_id: "charger1".to_string(),
+                location: "Outlet".to_string(),
+                metric: "Current.Import".to_string(),
+                value: 24.8,
+                unit: "A".to_string(),
+            }
+        );
+        assert_eq!(
+            metrics[1],
+            OpMetric {
+                event_ts: 1755910742720, // 2025-08-23T00:59:02.720Z in millis
+                station_id: "charger1".to_string(),
+                location: "Outlet".to_string(),
+                metric: "Energy.Active.Import.Register".to_string(),
+                value: 19334.1709,
+                unit: "kWh".to_string(),
+            }
+        );
     }
 
     #[test]

@@ -419,13 +419,13 @@ services:
     volumes:
       - ./time_series_ingest/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     environment:
-      - INFLUX_URL="http://influxdb2:8086"
+      - INFLUX_URL=http://influxdb2:8086
       - INFLUX_ORG=${INFLUX_ORG:-ev_network}
       - INFLUX_BUCKET=${INFLUX_BUCKET:-ocpp_data}
       - INFLUX_TOKEN=${INFLUX_TOKEN:-my-super-secret-auth-token}
       - KAFKA_BROKER=kafka-1:19092
       - KAFKA_TOPIC=${KAFKA_TOPIC}
-      - SCHEMA_REGISTRY="http://schema-registry:18081"
+      - SCHEMA_REGISTRY=http://schema-registry:8081
 
 volumes:
   oxia-data:

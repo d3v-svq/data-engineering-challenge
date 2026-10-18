@@ -5,40 +5,31 @@ Build a data platform which:
 * offers a unique source of truth
 * generates business value as soon as data is generated
 * facilitates operational status analysis (both streaming and historical)
-* improves scalability and flexibility (ad-hoc analysis)
+* improves scalability (capacity of grow)
+* and analysis flexibility (ad-hoc analysis)
+
+Taking the main goals in mind I elaborate a table with an eye bird overview and put in place the pieces/abstraction which help us to achieve all goals.
 
 ## High level implementation
-| Goal                                              | Abstraction                                        | Tools which can be used                                   |
-|---------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------|
-| Unique source of truth (streaming and historical) | Lakestream (~message/events system plus lakehouse) | Open Lakestream, Apache Fluss or Apache Kafka + Lakehouse |
-| Streaming analytics                               | Streaming engine and/or Timeseries database        | Apache Flink and/or Influxdb + grafana                    |
-| Batch analytics                                   | Batch engine                                       | Apache Flink/Apache Spark                                 |
-| Ad-hoc analysis                                   | SQL query engine                                   | Trino/Athena/DuckDB                                       |
+| Goal                                              | Abstraction                                        | Tools which can be used                                   | Comments                                                                                                                                       |
+|---------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Unique source of truth (streaming and historical) | Lakestream (~message/events system plus lakehouse) | Open Lakestream, Apache Fluss or Apache Kafka + Lakehouse | Generate the source of truth and also improve the scalability in the future                                                                    |
+| Streaming analytics                               | Streaming engine and/or Timeseries database        | Apache Flink and/or Influxdb + grafana                    | Facilitates operational status analysis, getting value as soon as data is generated and further scalability  (both system and new use cases)   |
+| Batch analytics                                   | Batch engine                                       | Apache Flink/Apache Spark                                 | Facilitates operational status analysis over historical data for opening new use cases (e.g. predictive maintenance)                           |
+| Ad-hoc analysis                                   | SQL query engine                                   | Trino/Athena/DuckDB                                       | Improve the flexibility and offers a system to perform quick analysis                                                                          |
 
 ## High level diagram
+Putting all together we can find that ideal data platform is as below:
+
+![high level diagram](./diagrams/HivemindChallenge-ArchHighLevel.png "High Level Diagram")
 
 # Prototype
-Taking into account the main goals and the high level implementation:
-
-### What this prototype brings
-* A little simple-dashboard with some stats about operational metric in real time.
-* A little example about doing ad-hoc analysis using historical data.
-* An end-to-end data-platform which offers a proof of concept for growing and scale with small changes.
-* A rust kafka-producer trying to do functional programming (I try my best, I promise :D) with some unit tests. 
-  * Disclaimer: It's one of my first rust development so don't take it too seriously.
-* How to guide to run it locally.
-* This small and pretty doc.
-
-### What this propotype DOESN'T bring :(
-* Production ready version of services used (kafka, influxdb, object storage, etc.).
-* Cross services definition or implementation (data governance, automatism, observability, etc.).
-* Historical analytics using batch engine.
-* Event time processing because entries in input data files has timestamps from past.
-* Only operational metrics are parsed.
-
+Taking into account the main goals and the high level implementation, we can now put names to the tools for implementing a working propototype. 
 
 ## Architecture
 ### Diagram
+![prototype diagram](./diagrams/HivemindChallenge-Prototype.png "Prototype Diagram")
+
 #### Diagram elements
 * **Producer**: in charge of parse the input data files and publish data to lakestream in AVRO format.
 * **Lakestream**: open stream storage system which mixes kafka and iceberg features for offering a unique source of truth.
@@ -55,7 +46,7 @@ Taking into account the main goals and the high level implementation:
 Data model defined is as follows (using kafka nomenclature):
 * topic: op_metric
 * format: avro
-  * schema: 
+  * schema:
   ```
     {
         "type": "record",
@@ -78,10 +69,52 @@ Data model defined is as follows (using kafka nomenclature):
 #### ocpp_operational_metrics
 Data model defined is as follows (using influxdb nomenclature):
 * **measurement**: ocpp_operational_metrics
-* **tags** (dimensions): 
-    * stationId
-    * location
-    * metric 
-    * unit
+* **tags** (dimensions):
+  * stationId
+  * location
+  * metric
+  * unit
 * **fields** (metrics):
   * value
+* **timestamp**: auto-generated by influxdb to emulate "near-real time data generation"
+
+### What this prototype brings
+* A little simple-dashboard with some stats about operational metric in real time.
+* A little example about doing ad-hoc analysis using historical data.
+* An end-to-end data-platform which offers a proof of concept for growing and scale with small changes.
+* A rust kafka-producer trying to do functional programming (I try my best, I promise :D) with some unit tests. 
+  * Disclaimer: It's one of my first rust development so don't take it too seriously.
+* How to guide to run it locally.
+* This small and pretty doc.
+
+### What this propotype DOESN'T bring :(
+* Production ready version of services used (kafka, influxdb, object storage, etc.).
+* Cross services definition or implementation (data governance, automatism, observability, etc.).
+* Historical analytics using batch engine.
+* Event time processing because entries in input data files has timestamps from past.
+* Only operational metrics are parsed.
+
+
+# Final considerations
+In this section we are going to cover the "things" we must improve to bring this system to production.
+
+## Shortcuts
+* Only metric events, from input file, are parsed.
+* Security is not implemented: secrets manager for credentials, data encryption, data permissions, granular services permissions, etc.
+* Standalone services deployment: all services have been deployed using 1 instance (mainly to a lack of local resources).
+* All code related to dashboards is stored as influx code inside this repo instead of having a tool to manage it.
+
+## Technical debt
+* Producer: 
+  * doesn't implement logging
+  * doesn't implement logic for specific errors
+  * doesn't use automatism (lint, code analysis, code quality, etc.)
+
+## To be production ready
+* Change standalone deployments for cluster deployments.
+* Use an IaC tool for services deployments instead of docker-compose file.
+* Use CI/CD tools to ensure good practices in integrations and deployments.
+* Enable security by default: central user management, using secure credentials, encrypt data, access control, etc.
+* Implement observability (services and process monitoring, metrics, alerts).
+* Develop processes for lakehouse maintenance (vacuum, compaction, snapshots) and good practices (partitioning, filtering, etc.)
+* Consider move to cloud if in-house team doesn't have capacity for operating the platform. Also, if they want to auto-scale "easily and quickly" on demand.

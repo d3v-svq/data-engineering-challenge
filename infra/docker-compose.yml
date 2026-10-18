@@ -2,9 +2,9 @@
 
 # The single Compose stack for Kafka with diskless Ursa storage.
 #
-#   docker compose up -d                              # oxia, minio, minio-init, kafka-1
-#   docker compose --profile only-streaming up -d     # + schema-registry
-#   docker compose --profile e2e up -d                # + polaris, polaris-setup, schema-registry
+#   docker compose up -d                                    # oxia, minio, minio-init, kafka-1, schema-registry
+#   docker compose --profile streaming-analytics up -d      # + influxdb2, telegraf
+#   docker compose --profile e2e up -d                      # + polaris, polaris-setup, schema-registry
 #
 # The default stack is the core cluster, which needs only the Kafka image. The
 # `e2e` profile adds the compaction/Iceberg services (and the locally
@@ -183,7 +183,6 @@ services:
   # only needs them started, not healthy.
   schema-registry:
     image: ${KARAPACE_IMAGE:-ghcr.io/aiven-open/karapace:6.2.2}
-    profiles: ["e2e", "only-streaming"]
     hostname: schema-registry
     restart: unless-stopped
     depends_on:
@@ -297,8 +296,56 @@ services:
       - duckdb-extensions:/root/.duckdb
     entrypoint: ["/duckdb", "-init", "/opt/ursa-demo/duckdb-init.sql"]
 
+  influxdb:
+    image: influxdb:2.9.1
+    container_name: influxdb2
+    profiles: [ "e2e", "streaming-analytics"]
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=AdminPassword123!
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUX_ORG:-ev_network}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUX_BUCKET:-ocpp_data}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN:-my-super-secret-auth-token}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  telegraf:
+    image: telegraf:1.40.1
+    container_name: telegraf
+    profiles: [ "e2e", "streaming-analytics"]
+    restart: unless-stopped
+    depends_on:
+      kafka-1:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      - INFLUX_URL="http://influxdb2:8086"
+      - INFLUX_ORG=${INFLUX_ORG:-ev_network}
+      - INFLUX_BUCKET=${INFLUX_BUCKET:-ocpp_data}
+      - INFLUX_TOKEN=${INFLUX_TOKEN:-my-super-secret-auth-token}
+      - KAFKA_BROKER=kafka-1:29092
+      - KAFKA_TOPIC=${KAFKA_TOPIC}
+      - SCHEMA_REGISTRY="http://schema-registry:18081"
+
 volumes:
   oxia-data:
   minio-data:
   kafka-1-data:
   duckdb-extensions:
+  influxdb_data:
+  influxdb_config:

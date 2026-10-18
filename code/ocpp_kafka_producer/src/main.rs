@@ -1,5 +1,6 @@
 mod models;
 mod parser;
+mod cli;
 
 use anyhow::{Context, Result};
 use apache_avro::schema::Schema;
@@ -8,17 +9,19 @@ use rdkafka::producer::{FutureProducer, FutureRecord};
 use schema_registry_converter::async_impl::avro::AvroEncoder;
 use schema_registry_converter::async_impl::schema_registry::SrSettings;
 use schema_registry_converter::schema_registry_common::SubjectNameStrategy;
+use clap::Parser;
 
 use crate::models::AVRO_SCHEMA;
 use crate::parser::extract_metrics_from_file;
+use crate::cli::Cli;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let input_file = "../../data/ocpp-data-many-chargers-small-sample.txt";
-    let remote_host = "192.168.1.131";
-    let brokers = format!("{}:29092", remote_host);
-    let schema_registry_url = format!("http://{}:18081", remote_host);
-    let topic = "op_metric";
+    let cli = Cli::parse();
+    let input_file = cli.input_file;
+    let brokers = cli.kafka_broker_url;
+    let schema_registry_url = cli.kafka_schema_registry_url;
+    let topic = cli.kafka_topic;
 
     let producer: FutureProducer = ClientConfig::new()
         .set("bootstrap.servers", brokers)

@@ -4,11 +4,11 @@
 #
 #   docker compose up -d                                    # oxia, minio, minio-init, kafka-1, schema-registry
 #   docker compose --profile streaming-analytics up -d      # + influxdb2, telegraf
-#   docker compose --profile e2e up -d                      # + polaris, polaris-setup, schema-registry
+#   docker compose --profile e2e up -d                      # + polaris, polaris-setup
 #
 # The default stack is the core cluster, which needs only the Kafka image. The
 # `e2e` profile adds the compaction/Iceberg services (and the locally
-# built compactor image).
+# built compactor image) and the duckdb.
 
 ---
 name: kafka-ursa

@@ -43,7 +43,8 @@ Taking into account the main goals and the high level implementation, we can now
 ## Project structure
 ````
 code/
-|----ocpp_kafka_producer/
+|----ad_hoc_analytics/                # Directory where SQL queries, for duckDB, for ad-hoc analysis are placed
+|----ocpp_kafka_producer/             # Directory where all code related to ingestion side is stored
 |      |----src/
 |      |      |--cli.rs               # Rust code to manage command line interface (mainly parameters)
 |      |      |--main.rs              # Rust main code in charge of: parse cli parameters, read input data file, filter metrics events, parse them as avro and send to kafka

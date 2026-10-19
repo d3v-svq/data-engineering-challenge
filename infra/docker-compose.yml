@@ -382,7 +382,6 @@ services:
 
   influxdb:
     image: influxdb:2.9.1
-    container_name: influxdb2
     profiles: [ "e2e", "streaming-analytics"]
     restart: unless-stopped
     ports:
@@ -405,7 +404,6 @@ services:
 
   telegraf:
     image: telegraf:1.40.1
-    container_name: telegraf
     profiles: [ "e2e", "streaming-analytics"]
     restart: unless-stopped
     depends_on:

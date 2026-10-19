@@ -40,6 +40,26 @@ Taking into account the main goals and the high level implementation, we can now
 * **Influxdb**: time-series databases where streaming analytics will be performed.
 * **DuckDB**: SQL query engine to perform queries in iceberg tables for ad-hoc analysis.
 
+## Project structure
+````
+code/
+|----ocpp_kafka_producer/
+|      |----src/
+|      |      |--cli.rs               # Rust code to manage command line interface (mainly parameters)
+|      |      |--main.rs              # Rust main code in charge of: parse cli parameters, read input data file, filter metrics events, parse them as avro and send to kafka
+|      |      |--models.rs            # Rust structs for managing input file data structures and output data structure
+|      |      |--parser.rs            # Rust code for parsing input data file
+|      |----Cargo.toml                # Cargo config file for package and dependencies managament
+|----streaming_analytics/      # Directory where influx queries for dashboards (variables and cells) are stored
+data/                          # Input data files used as source in the ocpp_kafka_producer program
+doc/                           # Directory where all docs, guides and diagrams are placed
+infra/                         # Directory where services deployment are managed
+|----lakehouse/                   # Directory where scripts used in docker-compose.yml are placed (extracted from https://github.com/openlakestream/kafka/tree/4.3-ursa/docker/examples/docker-compose-files/cluster/ursa/lakehouse)
+|----time_series_ingest/          # Directory where telegraf config are stored
+|----.env                         # Docker enviroment variables used in compose
+|----docker-compose.yml           # Docker compose file with all services and config to use
+````
+
 ## Data Models
 ### Kafka
 #### op_metric
@@ -84,7 +104,7 @@ Data model defined is as follows (using influxdb nomenclature):
 * An end-to-end data-platform which offers a proof of concept for growing and scale with small changes.
 * A rust kafka-producer trying to do functional programming (I try my best, I promise :D) with some unit tests. 
   * Disclaimer: It's one of my first rust development so don't take it too seriously.
-* How to guide to run it locally.
+* [How to guide](./how-to.md) to run it locally.
 * This small and pretty doc.
 
 ### What this propotype DOESN'T bring :(

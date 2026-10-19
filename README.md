@@ -1,3 +1,5 @@
+[Link to solution proposal documentation](./doc/proposal.md)
+
 # Hivemind Data Engineering Challenge
 
 Consider a company called "EV Coorp." in the fleet management sector that operates EV charging infrastructure and is encountering several challenges related to data processing and analytics. These challenges include difficulties in understanding the operational status of their infrastructure, which is compounded by manual analysis processes that are both time-consuming and prone to errors. Additionally, they are facing issues with growing data volumes that their current systems are unable to manage effectively. There is also a pressing need for both real-time monitoring and historical insights, which their current setup does not adequately provide. Same applies for the absence of ad hoc analysis capabilities. Furthermore, the data they collect is fragmented over different data sources and their current solution fails to deliver clear business value on time.

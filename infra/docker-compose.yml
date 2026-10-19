@@ -416,7 +416,7 @@ services:
     volumes:
       - ./time_series_ingest/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     environment:
-      - INFLUX_URL=http://influxdb2:8086
+      - INFLUX_URL=http://influxdb:8086
       - INFLUX_ORG=${INFLUX_ORG:-ev_network}
       - INFLUX_BUCKET=${INFLUX_BUCKET:-ocpp_data}
       - INFLUX_TOKEN=${INFLUX_TOKEN:-my-super-secret-auth-token}

@@ -51,4 +51,4 @@ Docker compose deploy and run:
      * user: admin
      * password: AdminPassword123!
    * Duckdb:
-     * Run the command `docker compose run duckdb -it` 
+     * Run the command `docker container start -ai hivemind-ev-duckdb-1` 

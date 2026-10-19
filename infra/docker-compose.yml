@@ -310,7 +310,6 @@ services:
 
   create-topic:
     <<: *kafka-cli
-    profiles: ["demo"]
     depends_on:
       kafka-ready:
         condition: service_completed_successfully

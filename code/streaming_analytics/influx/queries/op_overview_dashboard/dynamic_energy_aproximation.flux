@@ -1,7 +1,7 @@
 // 1. Calculate duration in hours between active zoom/range bounds
-startNs = float(v: int(v: v.timeRangeStart))
 stopNs = float(v: int(v: v.timeRangeStop))
-durationHours = (stopNs - startNs) / float(v: 3600000000000)
+startNs = stopNs - float(v: int(v: v.timeRangeStart))
+durationHours = (stopNs - startNs) / float(v: -3600000000000)
 
 // 2. Average Power multiplied by duration in hours
 from(bucket: "ocpp_data")
@@ -10,6 +10,7 @@ from(bucket: "ocpp_data")
   |> filter(fn: (r) => r.metric == "Power.Active.Import")
   |> filter(fn: (r) => r._field == "value")
   |> filter(fn: (r) => r.location == v.location)
+  |> filter(fn: (r) => r.stationId == v.station)
   |> group()
   |> mean()
   |> map(fn: (r) => ({

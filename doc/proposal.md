@@ -86,6 +86,17 @@ Data model defined is as follows (using kafka nomenclature):
 
 
 ### Iceberg
+* **Database**: lakehouse
+* **Schema**: default
+* **Table**: op_metric
+  * **Schema**:
+    * **event_ts**: timestamp
+    * **stationId**: varchar
+    * **location**: varchar
+    * **metric**: varchar
+    * **value**: float
+    * **unit**: varchar
+
 ### Influxdb
 #### ocpp_operational_metrics
 Data model defined is as follows (using influxdb nomenclature):
@@ -114,6 +125,24 @@ Data model defined is as follows (using influxdb nomenclature):
 * Historical analytics using batch engine.
 * Event time processing because entries in input data files has timestamps from past.
 * Only operational metrics are parsed.
+
+## Results
+### Streaming analytics
+To show value in "real time" we develop two simple dashboards: 
+1. First to see an operational overview of metrics stats and dynamic energy consumption aproximation
+![streaming_analytics_influxdb_OpOverviewDashboard.png](images/streaming_analytics_influxdb_OpOverviewDashboard.png)
+3. In the second dashboard we can compare metrics (mean) by station
+![streaming_analytics_influxdb_StationCompDashboard.png](images/streaming_analytics_influxdb_StationCompDashboard.png)
+
+
+We can see the business value of this type of development, it brings us fresh data when it occurs and opens a lot of opportunities to implement new use cases with real value like: real-time system alerting, forecasting, remote operations control of stations and the infraestructure around it, etc.
+
+### Ad-hoc analytics
+Here we show the results of executing sql queries using duckdb over lakehouse table with operational metric data. In the first screenshot we can see the first resultsand then, in the second one, we can see how the columns power_kw and power_aprox_cons_kwh update its value (updates are marked in red on the image).
+![adhoc_duckdb_FirstExecution.png](images/adhoc_duckdb_FirstExecution.png)
+![adhoc_duckdb_SecondExecution.png](images/adhoc_duckdb_SecondExecution.png)
+
+Batch and ad-hoc analytics add a big value too, due to the possibility of doing ad-hoc analysis with simplicity and extending it to batch jobs, so we can generate data for training machine learning models (e.g: forecasting or predictive maintenance).
 
 
 # Final considerations

@@ -13,10 +13,11 @@ with preprocess as (
 )
 
 select
+    stationId,
     event_year,
     event_month,
     event_day,
-    stationId,
+    event_hour,
     mean(value) as power_kw,
     mean(value) as power_aprox_cons_kwh
 from preprocess
@@ -26,4 +27,10 @@ group by
     event_day,
     event_hour,
     stationId
+order by
+    stationId,
+    event_year,
+    event_month,
+    event_day,
+    event_hour
 ;
